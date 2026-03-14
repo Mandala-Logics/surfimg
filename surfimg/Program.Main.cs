@@ -79,6 +79,12 @@ internal static partial class Program
             _currentFile = ScrapeFolder();
         }
 
+        if (_currentFile is null)
+        {
+            Console.WriteLine("Unable to open this file.");
+            Environment.Exit(0);
+        }
+
         _infoLine.Text = _currentFile.Path;
         
         SetUpArrows();

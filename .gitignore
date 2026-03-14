@@ -6,6 +6,7 @@
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+release/
 
 # Visual Studio Code
 .vscode/
