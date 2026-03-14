@@ -14,3 +14,11 @@ The project also serves as a demonstration of the SurfaceTerminal framework — 
 ```
 
 If the specified path is a file, then that file is opened, and if the path is a dir then the images in the dir can be browsed; in both cases the left and right arrows allow for sifting through pictures.
+
+If you move the file to **/bin then you can simply call:
+
+``` shell
+    surfimg
+```
+
+And all images in the working directory can be viewed.
