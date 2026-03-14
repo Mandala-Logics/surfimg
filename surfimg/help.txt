@@ -1,0 +1,7 @@
+MandalaLogics Surface Image Viewer
+
+Usage:
+
+surfimg [-h] path
+
+The specified path can either be an image file or a folder which contains image files.
