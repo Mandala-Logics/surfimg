@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using MandalaLogics.SurfaceTerminal.Surfaces;
 
@@ -242,10 +241,7 @@ namespace MandalaLogics.SurfaceTerminal.Text
                         leadingSpaces = 0;
                     }
 
-                    int x = lineStartX;
-
-                    for (int i = 0; i < leadingSpaces && x < surface.Width; i++, x++)
-                        surface[x, y] = ConsoleChar.WhiteSpace;
+                    int x = lineStartX + leadingSpaces;
 
                     for (int i = 0; i < s.Count && x < surface.Width; i++, x++)
                         surface[x, y] = s[i];

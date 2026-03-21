@@ -2,15 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
+using System.ComponentModel;
 using MandalaLogics.Collection;
+using MandalaLogics.SurfaceTerminal.Layout.Components;
 using MandalaLogics.Threading;
 
 namespace MandalaLogics.SurfaceTerminal.Layout
 {
-    public class SurfaceLayout : IReadOnlyDictionary<string, SurfacePanel>
+    public sealed class SurfaceLayout : IReadOnlyDictionary<string, SurfacePanel>
     {
-        public event SurfaceLayoutKeyPressedEventHandler? KeyPressed;
+        public event SurfaceLayoutBeforeKeyPressedEventHandler? BeforeKeyPressed;
+        internal event SurfaceLayoutBeforeKeyPressedEventHandler? BeforeBeforeKeyPressed;
+        public event SurfaceLayoutAfterKeyPressedEventHandler? AfterKeyPressed;
         
         public SurfaceLayoutNode RootNode { get; }
 
@@ -33,7 +36,7 @@ namespace MandalaLogics.SurfaceTerminal.Layout
         public IEnumerable<SurfacePanel> Values => ((IReadOnlyDictionary<string, SurfacePanel>)_panels).Values;
         
         public int Count => _panels.Count;
-
+        
         public int? MaxWidth { get; }
         public int? MaxHeight { get; }
 
@@ -67,8 +70,8 @@ namespace MandalaLogics.SurfaceTerminal.Layout
 
         public readonly object SyncRoot = new object();
 
-        private readonly ConcurrentDictionary<string, SurfacePanel> _panels;
-        private readonly SyncedList<SurfaceLayoutNode> _nodes;
+        protected readonly ConcurrentDictionary<string, SurfacePanel> _panels;
+        protected readonly SyncedList<SurfaceLayoutNode> _nodes;
             
         private int _lastIndex = 0;
         private int _selectedNode = -1;
@@ -97,6 +100,25 @@ namespace MandalaLogics.SurfaceTerminal.Layout
             MaxHeight = maxHeight;
         }
 
+        public SurfaceLayoutNode GetNode(string key)
+        {
+            lock (SyncRoot)
+            {
+                if (!_panels.TryGetValue(key, out var panel))
+                    throw new LayoutException(LayoutExceptionReason.KeyNotFound);
+                
+                foreach (var node in _nodes)
+                {
+                    if (panel.Equals(node._panel))
+                    {
+                        return node;
+                    }
+                }
+            }
+            
+            throw new LayoutException(LayoutExceptionReason.KeyNotFound);
+        }
+
         public void SetPanel(string key, SurfacePanel newPanel)
         {
             lock (SyncRoot)
@@ -112,18 +134,17 @@ namespace MandalaLogics.SurfaceTerminal.Layout
                     {
                         node._panel = newPanel;
                         
-                        if (_selectedNode == -1 && newPanel.CanBeSelected)
+                        if (_selectedNode == -1)
                         {
                             _selectedNode = node.Index;
+                            
+                            newPanel.Selected();
                         }
                         else if (oldPanel.IsSelected)
                         {
                             oldPanel.Deselected();
 
-                            if (!newPanel.CanBeSelected && !SelectNextPanel())
-                            {
-                                _selectedNode = -1;
-                            }
+                            newPanel.Selected();
                         }
                     }
                 }
@@ -150,25 +171,16 @@ namespace MandalaLogics.SurfaceTerminal.Layout
 
                 if (node.PanelIsSet)
                 {
-                    node.Panel.Returning -= PanelOnReturning;
-                    
                     if (node.Panel.IsSelected) node.Panel.Deselected();
                 }
                 
-                if (_selectedNode == -1 && panel.CanBeSelected)
+                if (_selectedNode == -1)
                 {
                     _selectedNode = node.Index;
-                    
-                    panel.Returning += PanelOnReturning;
                     
                     panel.Selected();
                 }
             }
-        }
-
-        private void PanelOnReturning(object sender, EventArgs e)
-        {
-            SelectNextPanel();
         }
 
         public void SelectPanel(string key)
@@ -178,12 +190,9 @@ namespace MandalaLogics.SurfaceTerminal.Layout
                 if (!_panels.TryGetValue(key, out var panel))
                     throw new LayoutException(LayoutExceptionReason.KeyNotFound);
 
-                if (!panel.CanBeSelected)
-                    throw new LayoutException(LayoutExceptionReason.PanelCannotBeSelected);
-
                 foreach (var node in _nodes)
                 {
-                    if (node.Panel.Equals(panel))
+                    if (!node.IsSplit && node.Panel.Equals(panel))
                     {
                         SelectedPanel?.Deselected();
                         
@@ -197,61 +206,25 @@ namespace MandalaLogics.SurfaceTerminal.Layout
             }
         }
 
-        public bool SelectNextPanel()
-        {
-            var a = _selectedNode;
-
-            for (int b = _selectedNode + 1; b < _nodes.Count; b++)
-            {
-                if (_nodes[b].PanelIsSet && _nodes[b].Panel.CanBeSelected)
-                {
-                    _selectedNode = b;
-                }
-            }
-
-            if (a != _selectedNode) //selected node has changed
-            {
-                if (a != -1) _nodes[a].Panel.Deselected();
-                _nodes[_selectedNode].Panel.Selected();
-                return true;
-            }
-
-            for (int b = 0; b < _selectedNode; b++)
-            {
-                if (_nodes[b].PanelIsSet && _nodes[b].Panel.CanBeSelected)
-                {
-                    _selectedNode = b;
-                }
-            }
-                    
-            if (a != _selectedNode) //selected node has changed
-            {
-                if (a != -1) _nodes[a].Panel.Deselected();
-                _nodes[_selectedNode].Panel.Selected();
-                return true;
-            }
-
-            return false;
-        }
-
         internal void OnKeyPressed(ConsoleKeyInfo keyInfo, ThreadController tc)
         {
             lock (SyncRoot)
             {
-                if (keyInfo.Key == ConsoleKey.Tab) //change panel
-                {
-                    SelectNextPanel();
-                }
-                else
-                {
-                    var args = new SurfaceLayoutKeyPressedEventArgs(keyInfo);
-                    
-                    KeyPressed?.Invoke(this, args);
+                var args = new SurfaceLayoutKeyPressedEventArgs(keyInfo);
+                
+                BeforeBeforeKeyPressed?.Invoke(this, args);
 
-                    if (args.Cancel) return;
+                if (args.Cancel) return;
+                
+                args = new SurfaceLayoutKeyPressedEventArgs(keyInfo);
                     
-                    if (_selectedNode != -1) _nodes[_selectedNode].Panel.KeyPressed(keyInfo);
-                }
+                BeforeKeyPressed?.Invoke(this, args);
+
+                if (args.Cancel) return;
+                    
+                if (_selectedNode != -1) _nodes[_selectedNode].Panel.KeyPressed(keyInfo);
+                
+                AfterKeyPressed?.Invoke(this, keyInfo);
             }
         }
 

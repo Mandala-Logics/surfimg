@@ -7,32 +7,43 @@ namespace MandalaLogics.Threading
     {
         public Action<ThreadController, T> Action {get;}
 
-        private readonly BlockingCollection<T> messages;
+        public TimeSpan CurrentExecutionTime => 
+            _lastStartTime is null ? TimeSpan.Zero : DateTime.Now - (DateTime)_lastStartTime;
+
+        private readonly BlockingCollection<T> _messages;
+        private DateTime? _lastStartTime;
 
         public MessageLoopThread(Action<ThreadController, T> action)
         {
             Action = action;
-            messages = new BlockingCollection<T>(new ConcurrentQueue<T>());
+            _messages = new BlockingCollection<T>(new ConcurrentQueue<T>());
         }
 
         internal MessageLoopThread(Action<ThreadController, T> action, IProducerConsumerCollection<T> collection)
         {
             Action = action;
-            messages = new BlockingCollection<T>(collection);
+            _messages = new BlockingCollection<T>(collection);
         }
 
         public void Add(T msg)
         {
-            messages.Add(msg);
+            _messages.Add(msg);
+        }
+
+        public bool TryTakeMessage(out T msg, TimeSpan waitTime)
+        {
+            return _messages.TryTake(out msg, WaitTime);
         }
 
         protected override void ThreadAction(ThreadController tc)
         {
             while (!tc.IsAbortRequested)
             {
-                if (messages.TryTake(out T msg, WaitTime))
+                if (_messages.TryTake(out T msg, WaitTime))
                 {
+                    _lastStartTime = DateTime.Now;
                     Action.Invoke(tc, msg);
+                    _lastStartTime = null;
                 }
             }
         }

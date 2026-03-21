@@ -1,3 +1,4 @@
+using MandalaLogics.SurfaceTerminal;
 using MandalaLogics.SurfaceTerminal.Layout;
 using MandalaLogics.SurfaceTerminal.Text;
 using SixLabors.ImageSharp;
@@ -7,25 +8,50 @@ namespace surfImg;
 
 internal static partial class Program
 {
-    private static void LayoutOnKeyPressed(SurfaceLayout sender, SurfaceLayoutKeyPressedEventArgs args)
+    private static void LayoutOnBeforeKeyPressed(object sender, SurfaceLayoutKeyPressedEventArgs args)
     {
-        args.Cancel = true;
-
-        switch (args.KeyInfo.Key)
+        if (args.KeyInfo.Key == ConsoleKey.Tab)
         {
-            case ConsoleKey.LeftArrow:
-                TryReverse();
-                break;
-            case ConsoleKey.RightArrow:
-                TryAdvance();
-                break;
-            default:
-                return;
+            args.Cancel = true;
+            
+            tabPanel.SelectNext();
         }
+        else if (tabPanel.SelectedKey == "viewer")
+        {
+            switch (args.KeyInfo.Key)
+            {
+                case ConsoleKey.LeftArrow:
+                    TryReverse();
+                    break;
+                case ConsoleKey.RightArrow:
+                    TryAdvance();
+                    break;
+                default:
+                    return;
+            }
+            
+            args.Cancel = true;
         
-        SetUpArrows();
+            SetUpArrows();
 
-        _infoLine.Text = new ConsoleString(_dir[_curr].Path);
+            infoLine.Text = new ConsoleString(_dir[_curr].Path);
+        }
+    }
+    
+    private static void TabPanelOnSelectedKeyChanged(object? sender, EventArgs e)
+    {
+        switch (tabPanel.SelectedKey)
+        {
+            case "about":
+                SurfaceTerminal.Layout.SetPanel("main", aboutPanel);
+                break;
+            case "viewer":
+                SurfaceTerminal.Layout.SetPanel("main", subLayoutPanel);
+                break;
+            case "options":
+                SurfaceTerminal.Layout.SetPanel("main", optionsPanel);
+                break;
+        }
     }
 
     private static void SetUpArrows()
@@ -53,7 +79,7 @@ internal static partial class Program
             builder.Append('>', new ConsoleDecoration(ConsoleColor.White, null));
         }
 
-        _arrowLine.Text = builder.GetConsoleString();
+        arrowLine.Text = builder.GetConsoleString();
     }
 
     private static void TryAdvance()
@@ -70,11 +96,11 @@ internal static partial class Program
             {
                 var img = Image.Load<Rgba32>(_dir[_curr].Path);
 
-                _displayPanel.Load(img);
+                displayPanel.Load(img);
 
                 return;
             }
-            catch (Exception e) when (e is UnknownImageFormatException || e is FileNotFoundException)
+            catch (Exception e) when (e is UnknownImageFormatException or FileNotFoundException)
             {
             }
             
@@ -95,11 +121,11 @@ internal static partial class Program
             {
                 var img = Image.Load<Rgba32>(_dir[_curr].Path);
 
-                _displayPanel.Load(img);
+                displayPanel.Load(img);
 
                 return;
             }
-            catch (Exception e) when (e is UnknownImageFormatException || e is FileNotFoundException)
+            catch (Exception e) when (e is UnknownImageFormatException or FileNotFoundException)
             {
             }
             

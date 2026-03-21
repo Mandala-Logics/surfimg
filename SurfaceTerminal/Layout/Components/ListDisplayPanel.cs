@@ -4,13 +4,11 @@ using System.Collections.Generic;
 using MandalaLogics.SurfaceTerminal.Surfaces;
 using MandalaLogics.SurfaceTerminal.Text;
 
-namespace MandalaLogics.SurfaceTerminal.Layout
+namespace MandalaLogics.SurfaceTerminal.Layout.Components
 {
     public class ListDisplayPanel : SurfacePanel, IList<SurfaceLine>
     {
-        public override bool CanBeSelected => false;
-
-        private readonly List<SurfaceLine> _lines = new List<SurfaceLine>();
+        private readonly List<SurfaceLine> _lines = [];
         
         public override void Render(ISurface<ConsoleChar> surface, ulong frameNumber)
         {

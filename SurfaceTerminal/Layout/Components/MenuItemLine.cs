@@ -1,18 +1,19 @@
 using System;
-using System.Runtime.InteropServices;
 using MandalaLogics.SurfaceTerminal.Surfaces;
 using MandalaLogics.SurfaceTerminal.Text;
 
-namespace MandalaLogics.SurfaceTerminal.Layout
+namespace MandalaLogics.SurfaceTerminal.Layout.Components
 {
     public class MenuItemLine : SurfaceLine
     {
-        public event SurfaceLineEventHandler? OnClicked;
-        
         public string Text { get; }
 
-        public MenuItemLine(string buttonText)
+        private readonly Action? _clickedAction;
+        
+        public MenuItemLine(string buttonText, Action? clickedAction)
         {
+            _clickedAction = clickedAction;
+            
             Text = buttonText;
         }
         
@@ -33,7 +34,7 @@ namespace MandalaLogics.SurfaceTerminal.Layout
             }
             
             
-            cs.WriteToSurface(surface, SurfaceWriteOptions.None, 0, 0);
+            cs.WriteToSurface(surface, SurfaceWriteOptions.Centered, 0, 0);
         }
 
         protected override bool StateChangeRequested(SurfaceLineState state)
@@ -42,13 +43,13 @@ namespace MandalaLogics.SurfaceTerminal.Layout
             {
                 case SurfaceLineState.Selected:
                 case SurfaceLineState.Deselected:
-                    return true;
+                    return Enabled;
                 case SurfaceLineState.Enabled:
                     return true;
                 case SurfaceLineState.Disabled:
                     return true;
                 case SurfaceLineState.Activated:
-                    OnClicked?.Invoke(this);
+                    _clickedAction?.Invoke();
                     return false;
                 default:
                     return false;
@@ -57,7 +58,10 @@ namespace MandalaLogics.SurfaceTerminal.Layout
 
         protected override void OnKeyPressed(ConsoleKeyInfo keyInfo)
         {
-            throw new NotImplementedException();
+            if (keyInfo.Key == ConsoleKey.Enter)
+            {
+                _clickedAction?.Invoke();
+            }
         }
     }
 }

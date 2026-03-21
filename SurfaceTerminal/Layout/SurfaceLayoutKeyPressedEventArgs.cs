@@ -2,8 +2,11 @@ using System;
 
 namespace MandalaLogics.SurfaceTerminal.Layout
 {
-    public delegate void SurfaceLayoutKeyPressedEventHandler
-        (SurfaceLayout sender, SurfaceLayoutKeyPressedEventArgs args);
+    public delegate void SurfaceLayoutBeforeKeyPressedEventHandler
+        (object sender, SurfaceLayoutKeyPressedEventArgs args);
+
+    public delegate void SurfaceLayoutAfterKeyPressedEventHandler
+        (object sender, ConsoleKeyInfo keyInfo);
     
     public class SurfaceLayoutKeyPressedEventArgs : EventArgs
     {

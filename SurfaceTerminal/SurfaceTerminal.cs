@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Diagnostics.Tracing;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using MandalaLogics.SurfaceTerminal.Layout;
+using MandalaLogics.SurfaceTerminal.Layout.Components;
 using MandalaLogics.SurfaceTerminal.Surfaces;
 using MandalaLogics.SurfaceTerminal.Text;
 using MandalaLogics.Threading;
@@ -14,6 +13,7 @@ namespace MandalaLogics.SurfaceTerminal
         public static event EventHandler? Terminated;
         
         private static readonly TimeSpan frameTime = TimeSpan.FromMilliseconds(50);
+        private static readonly TimeSpan inputLockedTime = TimeSpan.FromMilliseconds(500);
         private static readonly TextDisplayPanel errorPanel;
         
         public static ConsoleColor ForeColour { get; set; } = ConsoleColor.White;
@@ -36,7 +36,7 @@ namespace MandalaLogics.SurfaceTerminal
             
             Console.CancelKeyPress += ConsoleOnCancelKeyPress;
             
-            messageThread = new MessageLoopThread<ConsoleKeyInfo>((tc, cki) => _layout?.OnKeyPressed(cki, tc));
+            messageThread = new MessageLoopThread<ConsoleKeyInfo>(HandleKeyPressed);
             messageThread.Start();
             
             messageThread.ThreadComplete += OnThreadComplete;
@@ -45,7 +45,12 @@ namespace MandalaLogics.SurfaceTerminal
                 new ConsoleDecoration(null, ConsoleColor.DarkRed));
         }
 
-        private static void ConsoleOnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        private static void HandleKeyPressed(ThreadController tc, ConsoleKeyInfo keyInfo)
+        {
+            _layout?.OnKeyPressed(keyInfo, tc);
+        }
+
+        private static void ConsoleOnCancelKeyPress(object? sender, ConsoleCancelEventArgs e)
         {
             if (Running)
             {
@@ -100,8 +105,8 @@ namespace MandalaLogics.SurfaceTerminal
                 DisplayingError = true;
             }
             
-            //_displayThread.AwaitAbort();
-            messageThread.AwaitAbort();
+            _displayThread.AwaitAbort();
+            messageThread.Abort();
             _inputThread.AwaitAbort();
         }
 
@@ -109,6 +114,8 @@ namespace MandalaLogics.SurfaceTerminal
         {
             if (result.Failed)
             {
+                Console.Clear();
+                Console.SetCursorPosition(0, 0);
                 Console.WriteLine(result.Exception.Message);
                 Console.WriteLine(result.Exception.StackTrace);
 
@@ -127,6 +134,9 @@ namespace MandalaLogics.SurfaceTerminal
                     var keyInfo = Console.ReadKey(true);
                     
                     messageThread.Add(keyInfo);
+
+                    if (messageThread.CurrentExecutionTime > inputLockedTime)
+                        throw new LayoutException(LayoutExceptionReason.InputThreadLocked);
                 }
                 else
                 {

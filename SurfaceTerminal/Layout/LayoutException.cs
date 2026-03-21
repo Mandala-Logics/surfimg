@@ -12,7 +12,8 @@ namespace MandalaLogics.SurfaceTerminal.Layout
         KeyNotFound,
         PanelCannotBeSelected,
         LayoutDescriptionNotValid,
-        ProgrammerException
+        ProgrammerException,
+        InputThreadLocked
     }
     
     public class LayoutException : Exception

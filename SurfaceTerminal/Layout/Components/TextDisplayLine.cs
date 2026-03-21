@@ -2,7 +2,7 @@ using System;
 using MandalaLogics.SurfaceTerminal.Surfaces;
 using MandalaLogics.SurfaceTerminal.Text;
 
-namespace MandalaLogics.SurfaceTerminal.Layout
+namespace MandalaLogics.SurfaceTerminal.Layout.Components
 {
     public class TextDisplayLine : SurfaceLine
     {

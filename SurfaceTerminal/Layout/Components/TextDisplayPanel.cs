@@ -2,11 +2,10 @@ using System;
 using MandalaLogics.SurfaceTerminal.Surfaces;
 using MandalaLogics.SurfaceTerminal.Text;
 
-namespace MandalaLogics.SurfaceTerminal.Layout
+namespace MandalaLogics.SurfaceTerminal.Layout.Components
 {
     public class TextDisplayPanel : SurfacePanel
     {
-        public override bool CanBeSelected => false;
         public ConsoleString Text { get; set; }
         public SurfaceWriteOptions Options { get; set; } = SurfaceWriteOptions.None;
         public bool Fill { get; set; } = false;
@@ -24,6 +23,16 @@ namespace MandalaLogics.SurfaceTerminal.Layout
         
         public override void Render(ISurface<ConsoleChar> surface, ulong frameNumber)
         {
+            if (Text.IsEmpty) return;
+            
+            if (Fill)
+            {
+                surface.ForEach((x, y) =>
+                {
+                    surface[x, y] = new ConsoleTextChar(' ', Text[0].Decoration);
+                });
+            }
+            
             Text.WriteToSurface(surface, Options, 0, 0);
         }
 

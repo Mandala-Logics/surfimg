@@ -32,7 +32,8 @@ namespace MandalaLogics.SurfaceTerminal.Layout
                 else throw new LayoutException(LayoutExceptionReason.PanelNotSet);
             }
         }
-
+        
+        public bool Visible { get; set; } = true;
         public bool PanelIsSet => _panel is { };
         public SurfaceLayoutNode? Parent { get; }
         public bool DrawOutline { get; set; } = true;
@@ -120,15 +121,14 @@ namespace MandalaLogics.SurfaceTerminal.Layout
 
         internal void Render(ISurface<ConsoleChar> surface, ulong frameNumber)
         {
-            if (DrawOutline)
+            surface.ForEachEdge((x, y) =>
             {
-                surface.ForEachEdge((x, y) =>
-                {
-                    if (surface[x, y] is LayoutChar) return;
+                if (surface[x, y] is LayoutChar && DrawOutline) return;
                 
-                    surface[x, y] = new LayoutChar();
-                });
-            }
+                surface[x, y] = DrawOutline ? new LayoutChar() : ConsoleChar.WhiteSpace;
+            });
+
+            if (!Visible && !IsSplit) return;
             
             if (IsSplit)
             {
@@ -207,17 +207,6 @@ namespace MandalaLogics.SurfaceTerminal.Layout
             {
                 if (_panel is { })
                 {
-                    if (_panel.IsSelected && DrawOutline)
-                    {
-                        surface.ForEachEdge((x, y) =>
-                        {
-                            if (surface[x, y] is LayoutChar lc)
-                            {
-                                lc.Bold = true;
-                            }
-                        });
-                    }
-                    
                     _panel.Render(surface.Trim(1), frameNumber);
                 }
                 else

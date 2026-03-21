@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Xml;
 using MandalaLogics.SurfaceTerminal.Layout;
+using MandalaLogics.SurfaceTerminal.Layout.Components;
 
 namespace MandalaLogics.SurfaceTerminal.Parsing
 {

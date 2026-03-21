@@ -1,6 +1,6 @@
 layout
     split h 1
         panel header
-        split h -2
-            panel display
-            panel footer
+        split h 1
+            panel tabs
+            panel main

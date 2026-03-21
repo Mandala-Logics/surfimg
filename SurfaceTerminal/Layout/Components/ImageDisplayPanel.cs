@@ -7,16 +7,15 @@ using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace MandalaLogics.SurfaceTerminal.Layout
+namespace MandalaLogics.SurfaceTerminal.Layout.Components
 {
     public sealed class ImageDisplayPanel : SurfacePanel, IDisposable
     {
-        public override bool CanBeSelected => false;
-
         public string? ImagePath { get; private set; }
         public bool UseColour { get; set; } = true;
         public bool UseDensityRamp { get; set; } = false;
         public bool Dither { get; set; } = false;
+        public bool KeepRatio { get; set; } = true;
 
         public string DensityRamp { get; set; } = "@%#*+=-:. ";
 
@@ -58,6 +57,21 @@ namespace MandalaLogics.SurfaceTerminal.Layout
             InvalidateCache();
         }
 
+        public void Load(Stream stream)
+        {
+            DisposeImage();
+
+            _image = Image.Load<Rgba32>(stream);
+            
+            ImagePath = null;
+            InvalidateCache();
+        }
+
+        public void Redraw()
+        {
+            _lastRenderHeight = _lastRenderWidth = -1;
+        }
+
         public override void Render(ISurface<ConsoleChar> surface, ulong frameNumber)
         {
             if (_image is null)
@@ -68,21 +82,56 @@ namespace MandalaLogics.SurfaceTerminal.Layout
 
             if (surface.Width <= 0 || surface.Height <= 0)
                 return;
-
+            
+            int w, h;
+            
             if (_cachedFrame is null
                 || _lastRenderWidth != surface.Width
                 || _lastRenderHeight != surface.Height)
             {
-                _cachedFrame = BuildFrame(surface.Width, surface.Height);
+                if (KeepRatio)
+                {
+                    var ratio = _image.Width / (_image.Height / 2d);
+                    
+                    if (surface.Width < surface.Height)
+                    {
+                        w = surface.Width;
+                        h = (int)(w / ratio);
+                    }
+                    else
+                    {
+                        h = surface.Height;
+                        w = (int)(h * ratio);
+                    }
+                    
+                    _cachedFrame = BuildFrame(w, h);
+                }
+                else
+                {
+                    _cachedFrame = BuildFrame(w = surface.Width, h = surface.Height);
+                    
+                }
+                
                 _lastRenderWidth = surface.Width;
                 _lastRenderHeight = surface.Height;
             }
-
-            for (int y = 0; y < surface.Height; y++)
+            else
             {
-                for (int x = 0; x < surface.Width; x++)
+                w = _cachedFrame.GetUpperBound(0) + 1;
+                h = _cachedFrame.GetUpperBound(1) + 1;
+            }
+
+            var startX = Math.DivRem(surface.Width - w, 2, out _);
+
+            var startY = Math.DivRem(surface.Height - h, 2, out _);
+
+            int y1, y2, x1, x2;
+            
+            for (y1 = startY, y2 = 0; y1 < h + startY && y2 < h; y1++, y2++)
+            {
+                for (x1 = startX, x2 = 0; x1 < w + startX && x2 < w; x1++, x2++)
                 {
-                    surface[x, y] = _cachedFrame[x, y];
+                    surface[x1, y1] = _cachedFrame[x2, y2];
                 }
             }
         }

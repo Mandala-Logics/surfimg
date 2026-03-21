@@ -73,7 +73,7 @@ namespace MandalaLogics.SurfaceTerminal.Layout
         
         protected abstract void OnKeyPressed(ConsoleKeyInfo keyInfo);
         
-        private bool TryChangeState(SurfaceLineState newState)
+        protected bool TryChangeState(SurfaceLineState newState)
         {
             if (Owner is null) return false;
 
@@ -83,8 +83,6 @@ namespace MandalaLogics.SurfaceTerminal.Layout
             {
                 State = newState;
                 
-                OnStateChanged?.Invoke(this);
-
                 switch (newState)
                 {
                     case SurfaceLineState.Selected:
@@ -108,6 +106,8 @@ namespace MandalaLogics.SurfaceTerminal.Layout
                     default:
                         throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
                 }
+                
+                OnStateChanged?.Invoke(this);
                 
                 return true;
             }

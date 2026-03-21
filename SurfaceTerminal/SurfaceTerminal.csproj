@@ -1,18 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <RootNamespace>ConsoleSurface</RootNamespace>
+        <TargetFrameworks>net10.0;net8.0;net9.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Encoding\Encoding.csproj" />
+      <ProjectReference Include="..\Path\Path.csproj" />
       <ProjectReference Include="..\Threading\Threading.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="main.surf" />
     </ItemGroup>
 
 </Project>

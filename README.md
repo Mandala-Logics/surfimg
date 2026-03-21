@@ -2,6 +2,8 @@
 
 ![ml](./ml.png)
 ![wine](./wine.png)
+![ascii](./ascii.png)
+![options](./options.png)
 
 surfImg is a lightweight console-based image viewer built on top of the MandalaLogics SurfaceTerminal rendering system. It loads images using ImageSharp and renders them directly inside a terminal window by mapping pixel data to coloured console characters. Despite running entirely in a text console, the viewer supports colour rendering and simple navigation between images in a directory using keyboard input.
 

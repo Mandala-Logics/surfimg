@@ -2,12 +2,10 @@ using System;
 using MandalaLogics.SurfaceTerminal.Surfaces;
 using MandalaLogics.SurfaceTerminal.Text;
 
-namespace MandalaLogics.SurfaceTerminal.Layout
+namespace MandalaLogics.SurfaceTerminal.Layout.Components
 {
     public class EmptyPanel : SurfacePanel
     {
-        public override bool CanBeSelected => false;
-
         public override void Render(ISurface<ConsoleChar> surface, ulong frameNumber)
         {
             surface.Fill(ConsoleChar.WhiteSpace);

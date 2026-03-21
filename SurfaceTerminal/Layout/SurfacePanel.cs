@@ -1,4 +1,5 @@
 using System;
+using MandalaLogics.SurfaceTerminal.Layout.Components;
 using MandalaLogics.SurfaceTerminal.Surfaces;
 using MandalaLogics.SurfaceTerminal.Text;
 
@@ -6,10 +7,7 @@ namespace MandalaLogics.SurfaceTerminal.Layout
 {
     public abstract class SurfacePanel
     {
-        internal event EventHandler? Returning;
-        
-        public static readonly SurfacePanel Empty = new EmptyPanel();
-        public abstract bool CanBeSelected { get; }
+        public static readonly EmptyPanel Empty = new EmptyPanel();
         public bool IsSelected { get; private set; }
         
         protected SurfacePanel() {}
@@ -40,10 +38,5 @@ namespace MandalaLogics.SurfaceTerminal.Layout
 
         internal bool LineStateTryChange(SurfaceLine line, SurfaceLineState newState) =>
             OnLineStateTryChange(line, newState);
-
-        protected void Return()
-        {
-            Returning?.Invoke(this, EventArgs.Empty);
-        }
     }
 }

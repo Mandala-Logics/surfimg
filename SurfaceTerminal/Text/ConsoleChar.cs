@@ -1,5 +1,3 @@
-using System;
-
 namespace MandalaLogics.SurfaceTerminal.Text
 {
     public abstract class ConsoleChar
