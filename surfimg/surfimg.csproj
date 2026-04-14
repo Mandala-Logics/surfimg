@@ -8,7 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Linux\Linux.csproj" />
+      <ProjectReference Include="..\CommandParsing\CommandParsing.csproj" />
+      <ProjectReference Include="..\OS\OS.csproj" />
       <ProjectReference Include="..\SurfaceTerminal\SurfaceTerminal.csproj" />
     </ItemGroup>
 
@@ -19,6 +20,12 @@
       <EmbeddedResource Include="main.command" />
       <None Remove="help.txt" />
       <EmbeddedResource Include="help.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Locking">
+        <HintPath>..\Locking\bin\Release\netstandard2.1\Locking.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CommandParsing\CommandParsing.csproj" />
     <ProjectReference Include="..\Path\Path.csproj" />
   </ItemGroup>
 

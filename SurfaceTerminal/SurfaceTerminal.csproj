@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Encoding\Encoding.csproj" />
+      <ProjectReference Include="..\Locking\Locking.csproj" />
       <ProjectReference Include="..\Path\Path.csproj" />
       <ProjectReference Include="..\Threading\Threading.csproj" />
     </ItemGroup>

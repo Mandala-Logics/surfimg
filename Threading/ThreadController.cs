@@ -1,4 +1,5 @@
 using System.Threading;
+using MandalaLogics.Threading.Progress;
 
 namespace MandalaLogics.Threading
 {
@@ -10,10 +11,11 @@ namespace MandalaLogics.Threading
 
         internal bool HasReturnValue {get; private set;} = false;
         internal object? ReturnValue {get; private set;} = null;
+        internal ProgressLimitType SubProcessReportingLimit { get; set; } = ProgressLimitType.Nothing;
 
         private CancellationToken? _cancellationToken;
         private volatile bool _abortRequested = false;
-        public ThreadProgress Progress;
+        public readonly ThreadProgress Progress;
 
         internal ThreadController(CancellationToken? cancellationToken, ThreadProgress progress)
         {

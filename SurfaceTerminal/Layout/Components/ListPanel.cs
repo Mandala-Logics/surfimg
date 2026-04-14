@@ -63,20 +63,25 @@ namespace MandalaLogics.SurfaceTerminal.Layout.Components
                     }
                 }
                 
+                if (!e.MoveNext())
+                {
+                    reachedEnd = true;
+                }
+                
                 if (Lines.Count > h)
                 {
-                    var arrowSlice = surface.SliceLine(h);
-                    ConsoleStringBuilder builder = new ConsoleStringBuilder(3);
+                    var builder = new ConsoleStringBuilder(3);
 
-                    builder.Append('<', 
+                    builder.Append('↑', 
                         new ConsoleDecoration(removed ? null : ConsoleColor.DarkGray, null));
-                    
+                
                     builder.Append(ConsoleChar.WhiteSpace);
 
-                    builder.Append('>', 
+                    builder.Append('↓', 
                         new ConsoleDecoration(reachedEnd ? ConsoleColor.DarkGray : null, null));
-                    
-                    builder.GetConsoleString().WriteToSurface(arrowSlice, SurfaceWriteOptions.None, 0, 0);
+                
+                    builder.GetConsoleString()
+                        .WriteToSurface(surface, SurfaceWriteOptions.None, 0, surface.Height - 1);
                 }
 
                 var y = -1;

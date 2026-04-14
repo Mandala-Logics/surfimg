@@ -1,6 +1,6 @@
 using System;
 
-namespace MandalaLogics.Encoding
+namespace MandalaLogics
 {
     public sealed class PlaceholderException : Exception { }
 }

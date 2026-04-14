@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using MandalaLogics.Threading.Progress;
 
 namespace MandalaLogics.Threading
 {
@@ -27,6 +28,8 @@ namespace MandalaLogics.Threading
             State = new ThreadState(this);
 
             Controller = new ThreadController(null, State.Prog);
+            
+            ThreadManager.Init();
         }
 
         public void Start(CancellationToken cancellationToken)
@@ -110,11 +113,11 @@ namespace MandalaLogics.Threading
 
         protected abstract void ThreadAction(ThreadController tc);
 
-        protected void RunAction()
+        private void RunAction()
         {
             try
             {   
-                
+                ThreadManager.AddController(Controller);
                 
                 if (Controller.IsAbortRequested)
                 {
@@ -144,6 +147,7 @@ namespace MandalaLogics.Threading
             }
             finally
             {
+                ThreadManager.RemoveController();
                 Controller.Reset();
                 ResetEvent.Set();
             }

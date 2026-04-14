@@ -18,6 +18,10 @@ namespace MandalaLogics.SurfaceTerminal.Layout.Components
             {
                 text += '█';
             }
+            else
+            {
+                text += ' ';
+            }
             
             var s = new ConsoleString(text, TextDecoration);
             

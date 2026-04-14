@@ -38,7 +38,7 @@ namespace MandalaLogics.Threading
 
         private void ThreadComplete(ThreadBase sender, ThreadResult result)
         {
-            if (result.Exception is Exception)
+            if (result.Exception != null)
             {
                 ExceptionAction.Invoke(result.Exception);
 

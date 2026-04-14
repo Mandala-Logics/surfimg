@@ -8,7 +8,7 @@ using MandalaLogics.Encoding;
 
 namespace MandalaLogics.Path
 {
-
+    [Encodable("lin_path")]
     public class LinuxPath : PathBase, IEncodable
     {
         public static PathStructure PathStructure { get; } = new PathStructure("LinuxPath", typeof(LinuxPath), "/", 0, "/", null, true, 0, PathProximityType.Local);
@@ -53,7 +53,7 @@ namespace MandalaLogics.Path
 
             Home = new LinuxPath(CommandHelper.Bash(@"echo ~").StandardOutput.Trim(), DestType.Dir);
 
-            EncodedObject.RegisterTypes(typeof(LinuxPath));
+            EncodingRegister.RegisterTypes(typeof(LinuxPath));
         }
         
         public override AccessLevel CheckAccess()
@@ -393,22 +393,6 @@ namespace MandalaLogics.Path
                 }
             }
 
-        }
-        public override long FileLength()
-        {
-            var res = CommandHelper.Bash($"stat -c %s '{Path}'");
-
-            if (res.ExitCode != 0)
-            {
-                SetExists(false);
-                throw new PathAccessException(this, $"Cannot get length, file/dir does not exist or cannot be accessed: {Path}");
-            }
-            else
-            {
-                SetExists(true);
-            }
-
-            return long.Parse(res.StandardOutput);
         }
 
         public static LinuxPath GetWorkingDir()

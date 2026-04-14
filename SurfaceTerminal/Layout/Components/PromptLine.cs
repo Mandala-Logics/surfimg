@@ -8,8 +8,8 @@ namespace MandalaLogics.SurfaceTerminal.Layout.Components
     {
         public string Prompt { get; set; } = string.Empty;
 
-        private string _res = string.Empty;
-        
+        public string Text { get; set; } = string.Empty;
+
         public override void Render(ISurface<ConsoleChar> surface, ulong frameNumber)
         {
             if (surface.Width < 2) return;
@@ -18,18 +18,22 @@ namespace MandalaLogics.SurfaceTerminal.Layout.Components
             
             builder.Append(Prompt + " : ", new ConsoleDecoration(ConsoleColor.Gray, null));
 
-            var displayString = _res;
+            var displayString = Text;
             
             if (Selected && frameNumber % 32 > 16)
             {
                 displayString += '█';
+            }
+            else
+            {
+                displayString += ' ';
             }
 
             builder.Append(displayString, default);
 
             var cs = builder.GetConsoleString();
             
-            cs.WriteToSurface(surface, SurfaceWriteOptions.Centered, 0, 0);
+            cs.WriteToSurface(surface, SurfaceWriteOptions.None, 0, 0);
 
             if (cs.Count > surface.Width)
             {
@@ -57,16 +61,16 @@ namespace MandalaLogics.SurfaceTerminal.Layout.Components
                 {
                     case ConsoleKey.Backspace:
                         
-                        if (_res.Length == 0) return;
+                        if (Text.Length == 0) return;
 
-                        _res = _res[..^1];
+                        Text = Text[..^1];
                             
                         break;
                 }
             }
             else if (keyInfo.Modifiers == 0)
             {
-                _res += keyInfo.KeyChar;
+                Text += keyInfo.KeyChar;
             }
         }
     }

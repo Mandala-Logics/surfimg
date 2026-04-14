@@ -1,12 +1,12 @@
 using System;
 
-namespace MandalaLogics.Threading
+namespace MandalaLogics.Threading.Progress
 {
-    internal class ThreadProgressWrapper : IThreadProgress
+    internal class ThreadProgressReadOnlyWrapper : IReadOnlyThreadProgress
     {
         private readonly ThreadProgress _progress;
 
-        internal ThreadProgressWrapper(ThreadProgress progress)
+        internal ThreadProgressReadOnlyWrapper(ThreadProgress progress)
         {
             _progress = progress;
         }

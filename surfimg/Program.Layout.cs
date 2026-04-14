@@ -1,4 +1,3 @@
-using System.Reflection.Metadata;
 using MandalaLogics.Command;
 using MandalaLogics.SurfaceTerminal;
 using MandalaLogics.SurfaceTerminal.Layout;
@@ -128,8 +127,7 @@ internal static partial class Program
         aboutPanel.Add(new TextDisplayLine()
         {
             Text = "https://github.com/Mandala-Logics/",
-            Options = SurfaceWriteOptions.Centered, 
-            Decoration = new ConsoleDecoration(ConsoleColor.DarkRed, ConsoleColor.Yellow)
+            Options = SurfaceWriteOptions.Centered
         });
         
         aboutPanel.Add(new TextDisplayLine());
@@ -137,8 +135,7 @@ internal static partial class Program
         aboutPanel.Add(new TextDisplayLine()
         {
             Text = "(c) Mandala Logics - MIT Licence",
-            Options = SurfaceWriteOptions.Centered, 
-            Decoration = new ConsoleDecoration(ConsoleColor.Gray, null)
+            Options = SurfaceWriteOptions.Centered
         });
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace MandalaLogics.Threading
+namespace MandalaLogics.Threading.Progress
 {
     public sealed class ThreadProgress : IThreadProgress, IProgress<int>
     {
@@ -21,15 +21,9 @@ namespace MandalaLogics.Threading
             MaxValue = int.MaxValue;
         }
 
-        public void SetText(string text)
+        public void Report(string text)
         {
             Text = text;
-            ProgressUpdated?.Invoke(this, EventArgs.Empty);
-        }
-        
-        public void SetValue(int value)
-        {
-            Value = value;
             ProgressUpdated?.Invoke(this, EventArgs.Empty);
         }
 
@@ -45,6 +39,15 @@ namespace MandalaLogics.Threading
             MaxValue = maxValue;
         }
 
-        public void Report(int value) => SetValue(value);
+        public void Report(int value)
+        {
+            Value = value;
+            ProgressUpdated?.Invoke(this, EventArgs.Empty);
+        }
+        
+        public IThreadProgress Limit(ProgressLimitType type)
+        {
+            return new ThreadProgressLimitWrapper(this, type);
+        }
     }
 }

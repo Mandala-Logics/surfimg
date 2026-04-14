@@ -2,9 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
-using MandalaLogics.Collection;
-using MandalaLogics.SurfaceTerminal.Layout.Components;
 using MandalaLogics.Threading;
 
 namespace MandalaLogics.SurfaceTerminal.Layout
@@ -70,8 +67,8 @@ namespace MandalaLogics.SurfaceTerminal.Layout
 
         public readonly object SyncRoot = new object();
 
-        protected readonly ConcurrentDictionary<string, SurfacePanel> _panels;
-        protected readonly SyncedList<SurfaceLayoutNode> _nodes;
+        private readonly ConcurrentDictionary<string, SurfacePanel> _panels;
+        private readonly List<SurfaceLayoutNode> _nodes;
             
         private int _lastIndex = 0;
         private int _selectedNode = -1;
@@ -85,7 +82,7 @@ namespace MandalaLogics.SurfaceTerminal.Layout
 
             _panels = new ConcurrentDictionary<string, SurfacePanel>();
 
-            _nodes = new SyncedList<SurfaceLayoutNode> { RootNode };
+            _nodes = new List<SurfaceLayoutNode>([RootNode]);
         }
         
         public SurfaceLayout(int? maxWidth, int? maxHeight) : this()

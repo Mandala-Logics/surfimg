@@ -1,8 +1,8 @@
 using System;
 
-namespace MandalaLogics.Threading
+namespace MandalaLogics.Threading.Progress
 {
-    public interface IThreadProgress
+    public interface IReadOnlyThreadProgress
     {
         public event EventHandler? ProgressUpdated;
         

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Xml;
 using MandalaLogics.SurfaceTerminal.Surfaces;
 using MandalaLogics.SurfaceTerminal.Text;
 
@@ -64,6 +63,14 @@ public class OptionsLine : SurfaceLine, IReadOnlyDictionary<string, string>
         csb.Append('>', new ConsoleDecoration(x < _options.Count - 1 ? null : ConsoleColor.DarkGray, null));
         
         csb.GetConsoleString().WriteToSurface(surface, SurfaceWriteOptions.Centered, 0, 0);
+    }
+
+    public void SelectLine(string key)
+    {
+        if (!ContainsKey(key))
+            throw new LayoutException(LayoutExceptionReason.KeyNotFound);
+        
+        SelectedKey = key;
     }
 
     protected override bool StateChangeRequested(SurfaceLineState state) => true;

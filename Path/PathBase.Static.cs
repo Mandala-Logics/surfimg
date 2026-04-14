@@ -11,9 +11,6 @@ namespace MandalaLogics.Path
     {
         public static PathBase PathSubrtation(PathBase path1, PathBase path2)
         {
-            if (path1 is null) throw new ArgumentNullException("path1");
-            else if (path2 is null) throw new ArgumentNullException("path2");
-
             if (path2.Count >= path1.Count)
             {
                 throw new PathException("Cannot subtract a path which has the same number of elements " +
@@ -76,8 +73,8 @@ namespace MandalaLogics.Path
         
         public static PathBase PathAddition(PathBase path1, PathBase path2)
         {
-            if (path1 is null) throw new ArgumentNullException("path1");
-            else if (path2 is null) throw new ArgumentNullException("path2");
+            if (path1 is null) throw new ArgumentNullException(nameof(path1));
+            else if (path2 is null) throw new ArgumentNullException(nameof(path2));
 
             if (path2.IsAbsolutePath) throw new PathTypeException("Cannot append an absolute path, must be a relitive path.");
             else if (path1.IsFile) throw new PathTypeException("Cannot append anything to a file path.");
@@ -99,8 +96,8 @@ namespace MandalaLogics.Path
         
         public static bool PathStartsWith(PathBase path1, PathBase path2)
         {
-            if (path1 is null) throw new ArgumentNullException("path1");
-            else if (path2 is null) throw new ArgumentNullException("path2");
+            if (path1 is null) throw new ArgumentNullException(nameof(path1));
+            else if (path2 is null) throw new ArgumentNullException(nameof(path2));
 
             if (path1.Count < path2.Count) return false;
 
@@ -116,8 +113,8 @@ namespace MandalaLogics.Path
         
         public static bool PathEndsWith(PathBase path1, PathBase path2)
         {
-            if (path1 is null) throw new ArgumentNullException("path1");
-            else if (path2 is null) throw new ArgumentNullException("path2");
+            if (path1 is null) throw new ArgumentNullException(nameof(path1));
+            else if (path2 is null) throw new ArgumentNullException(nameof(path2));
 
             if (path2.IsAbsolutePath) return false;
             else if (path1.Count < path2.Count) return false;
@@ -126,7 +123,7 @@ namespace MandalaLogics.Path
         }
         public static PathBase PathSubpath(PathBase path, int start, int count)
         {
-            if (path is null) throw new ArgumentNullException("path");
+            if (path is null) throw new ArgumentNullException(nameof(path));
 
             if (start < 0 || start >= path.Count) throw new ArgumentException($"Start index out of range: {start}");
             else if (count <= 0) throw new ArgumentException($"Count must be greater than zero: {count}");
@@ -193,7 +190,7 @@ namespace MandalaLogics.Path
         
         public static PathBase PathAppend(PathBase path, string name)
         {
-            if (path is null) throw new ArgumentNullException("path");
+            if (path is null) throw new ArgumentNullException(nameof(path));
             else if (path.IsFile) throw new PathTypeException("Cannot append anything to a file path.");
             else if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name to append cannot be null or empty.");
 
@@ -273,11 +270,11 @@ namespace MandalaLogics.Path
 
                 if (m.Success)
                 {
-                    if (ExtTemplate.CatchValidate(m.Groups[2].Value, out string ext) is StringValidationException extException)
+                    if (ExtTemplate.CatchValidate(m.Groups[2].Value, out string ext) is { } extException)
                     {
                         throw new NameNotValidException($"File extension is not valid: '{ext}'. {extException.Message}");
                     }
-                    else if (NameTemplate.CatchValidate(m.Groups[1].Value, out fileName) is StringValidationException nameException)
+                    else if (NameTemplate.CatchValidate(m.Groups[1].Value, out fileName) is { } nameException)
                     {
                         throw new NameNotValidException($"File name is not valid: '{fileName}'. {nameException.Message}");
                     }
@@ -393,12 +390,12 @@ namespace MandalaLogics.Path
         
         public static bool operator ==(PathBase left, PathBase right)
         {
-            return EqualityComparer<PathBase>.Default.Equals(left, right);
+            return left.Equals(right);
         }
         
         public static bool operator !=(PathBase left, PathBase right)
         {
-            return !(left == right);
+            return !left.Equals(right);
         }
         
         public static string CleanPath(string path)
@@ -431,8 +428,6 @@ namespace MandalaLogics.Path
             return string.Join(", ", s);
         }
         
-        
-
         public static PathBase FindCommandPath(PathBase workingDir, string pattern)
         {
             PathBase? x = null;

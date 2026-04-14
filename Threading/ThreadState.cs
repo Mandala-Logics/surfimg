@@ -2,43 +2,44 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MandalaLogics.Threading;
+using MandalaLogics.Threading.Progress;
 
 namespace MandalaLogics
 {
     public class ThreadState
     {
         public bool NotYetStarted {get; private set;} = true;
-        public bool FinishedRunning => res is object;
+        public bool FinishedRunning => _res is object;
         public bool Started => !NotYetStarted;
         public bool Running {get; private set;}
-        public bool Failed => res?.Failed ?? false;
-        public bool Aborted => res?.Aborted ?? false;
+        public bool Failed => _res?.Failed ?? false;
+        public bool Aborted => _res?.Aborted ?? false;
         public ThreadResult Result
         {
             get
             {
-                if (res is null) { throw new InvalidOperationException("Thread has not yet finished running or has not yet started; result not avalible."); }
-                else { return (ThreadResult)res; }
+                if (_res is null) { throw new InvalidOperationException("Thread has not yet finished running or has not yet started; result not avalible."); }
+                else { return (ThreadResult)_res; }
             }
         }
         public ThreadBase Owner {get;}
 
-        public IThreadProgress Progress { get; }
+        public IReadOnlyThreadProgress Progress { get; }
         
         internal readonly ThreadProgress Prog = new ThreadProgress();
-        private ThreadResult? res;
+        private ThreadResult? _res;
 
         public ThreadState(ThreadBase owner)
         {
             Owner = owner;
 
-            Progress = new ThreadProgressWrapper(Prog);
+            Progress = new ThreadProgressReadOnlyWrapper(Prog);
         }
 
         internal void Reset()
         {
             NotYetStarted = true;
-            res = null;
+            _res = null;
             Prog.Reset();
         }
 
@@ -50,7 +51,7 @@ namespace MandalaLogics
 
         internal void SetResult(ThreadResult res)
         {
-            this.res = res;
+            this._res = res;
             Running = false;
         }
 
@@ -68,7 +69,7 @@ namespace MandalaLogics
 
             var ret = Owner.ResetEvent.Wait(timeout);
 
-            if (res?.Exception is { }) throw new AggregateException("Thread failed", res.Exception);
+            if (_res?.Exception is { }) throw new AggregateException("Thread failed", _res.Exception);
             else return ret;
         }
 

@@ -7,7 +7,6 @@ namespace MandalaLogics.SurfaceTerminal.Layout.Components
     public class TextDisplayLine : SurfaceLine
     {
         public ConsoleString Text { get; set; } = ConsoleString.Empty;
-        public ConsoleDecoration Decoration { get; set; } = default;
         public SurfaceWriteOptions Options { get; set; } = SurfaceWriteOptions.None;
         
         public override void Render(ISurface<ConsoleChar> surface, ulong frameNumber)

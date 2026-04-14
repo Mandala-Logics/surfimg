@@ -1,6 +1,6 @@
+using MandalaLogics;
 using MandalaLogics.Command;
 using MandalaLogics.CommandParsing;
-using MandalaLogics.Encoding;
 using MandalaLogics.Path;
 using MandalaLogics.SurfaceTerminal;
 using MandalaLogics.SurfaceTerminal.Layout.Components;
@@ -59,7 +59,7 @@ internal static partial class Program
             
             try
             {
-                displayPanel.Load(_currentFile?.Path ?? throw new PlaceholderException());
+                displayPanel.Load(_currentFile?.Path!);
             }
             catch (Exception e) when (e is UnknownImageFormatException or FileNotFoundException)
             {
@@ -82,7 +82,7 @@ internal static partial class Program
             }
         }
 
-        infoLine.Text = _currentFile.Path;
+        infoLine.Text = _currentFile!.Path;
         
         SetUpArrows();
         
@@ -106,6 +106,7 @@ internal static partial class Program
                 return pb;
             }
             catch (UnknownImageFormatException) { }
+            catch (InvalidImageContentException) { }
             catch (FileNotFoundException) { }
         }
         
